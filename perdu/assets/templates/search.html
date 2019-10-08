@@ -1,0 +1,21 @@
+{% include 'header.html' %}
+<div class="container">
+  <form method="get" action="{{ url_for('search') }}">
+    <div class="row" style="margin-top: 25%">
+      <div class="six columns">
+        <label for="search_term">Search term(s)</label>
+        <input class="u-full-width" type="text" placeholder="steel OR brick OR soybeans" id="search_term" name="search_term">
+      </div>
+      <div class="six columns">
+        <label for="search_catalogue">Search catalogue</label>
+        <select class="u-full-width" id="catalogue" name="catalogue">
+          {% for c in catalogues %}
+          <option value="{{ c }}" {% if c == catalogue %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <button class="button-primary" type="submit">Search</button>
+  </form>
+</div>
+{% include 'footer.html' %}

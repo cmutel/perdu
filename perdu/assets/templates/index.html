@@ -1,0 +1,26 @@
+{% include 'header.html' %}
+<div class="container">
+  <div class="row" style="margin-top: 20%">
+    <div>
+      <h4>Perdu webapp</h4>
+      <p><a href="">Perdu</a> is a python library and webapp for searching standard industry and product classifiers.</p>
+    </div>
+  </div>
+  <dir class="row">
+    <div class="one-half column">
+      <h5>Search nomenclature catalogues:</h5>
+      <ul>
+        <li><a href="{{ url_for('search', catalogue='naics') }}">NAICS</a> (<a href="https://www.census.gov/eos/www/naics/">what is this?</a>)</li>
+        <li><a href="{{ url_for('search', catalogue='gs1') }}">GS1 GPC</a> (<a href="https://www.gs1.org/standards/gpc">what is this?</a>)</li>
+      </ul>
+    </div>
+    <div class="one-half column">
+      <h5>Upload file for matching:</h5>
+      <form method="post" action="{{ url_for('index') }}">
+        <input type="file" name="file_upload">
+        <button class="button" type="submit">Upload</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% include 'footer.html' %}
