@@ -16,7 +16,7 @@ install:
   - call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
   - python --version
   - conda config --set always_yes yes
-  - conda update -n base -c defaults conda;
+  - conda update conda;
   - conda install -y -c conda-forge appdirs docopt whoosh flask pytest pytest-cov
   - pip install -e .
 
