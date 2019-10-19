@@ -129,11 +129,26 @@ function exit_modal(btn){
             // Hide modal
             var modal = document.getElementById('modal_match')
             modal.style.display = "none";
+            // Send selection to web app
+            var payload = {
+                'item to match': item_to_search_for,
+                'match': match
+            };
+
+            var data = new FormData();
+            data.append( "json", JSON.stringify(payload) );
+
+            fetch("/file/<hash>/selection",
+            {
+                method: "POST",
+                body: data
+            });
+
+
             return;
         };
     };
 
-    console.log(btn)
 };
 
 // Populate table with search results as the search field is updated.

@@ -17,7 +17,8 @@ from flask import (
     Response,
     send_file,
     url_for,
-    jsonify
+    jsonify,
+    json
 )
 from peewee import DoesNotExist, IntegrityError
 from werkzeug.utils import secure_filename
@@ -94,6 +95,9 @@ def search():
 
 @perdu_app.route("/file/<hash>/selection", methods=["POST"])
 def selection_made(hash):
+    d = json.loads(request.form['json'])
+    item_to_match = d['item to match']
+    selection = d['match']
     return ""
 
 
