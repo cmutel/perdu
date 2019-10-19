@@ -86,6 +86,11 @@ def search():
         )
 
 
+@perdu_app.route("/file/<hash>/selection", methods=["POST"])
+def selection_made(hash):
+    return ""
+
+
 @perdu_app.route("/file/<hash>", methods=["GET"])
 def uploaded_file(hash):
     try:
