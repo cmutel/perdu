@@ -1,3 +1,4 @@
+peewee
 appdirs
 docopt
 flask

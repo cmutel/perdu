@@ -16,7 +16,7 @@
     </div>
     <div class="one-half column">
       <h5>Upload file for matching:</h5>
-      <form method="post" action="{{ url_for('index') }}">
+      <form method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
         <input type="file" name="file_upload">
         <button class="button" type="submit">Upload</button>
       </form>

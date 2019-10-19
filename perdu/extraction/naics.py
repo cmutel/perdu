@@ -51,7 +51,7 @@ def subtract_excepts(string, existing=None):
 def split_cross_references(obj):
     for i, line in enumerate(obj):
         if obj[i].lower().startswith("cross-references"):
-            return " ".join(obj[:i]).strip(), [o.strip() for o in obj[i+1:]]
+            return " ".join(obj[:i]).strip(), [o.strip() for o in obj[i + 1 :]]
     else:
         return " ".join(obj).strip(), []
 
@@ -62,35 +62,36 @@ def process_section(section):
     first_line = section.pop(0)
     match = header.match(first_line)
     assert match
-    data['code'] = match['code']
-    data['name'] = first_line.replace(data['code'], '').strip()
+    data["code"] = match["code"]
+    data["name"] = first_line.replace(data["code"], "").strip()
 
     i = 0
     while i < len(section) - 1:
         # Add together sentences split by PDF
-        if (not section[i].startswith("Cross-References")
-            and not section[i].strip().endswith(".")):
-            section[i] += (" " + section.pop(i + 1))
+        if not section[i].startswith("Cross-References") and not section[
+            i
+        ].strip().endswith("."):
+            section[i] += " " + section.pop(i + 1)
         # Restore paragraph breaks
-        elif not section[i].startswith("Cross-References") and \
-                section[i].strip().endswith("."):
+        elif not section[i].startswith("Cross-References") and section[
+            i
+        ].strip().endswith("."):
             section[i] = section[i].strip() + "\n"
             i += 1
         else:
             i += 1
 
-    data['description'], data['cross references'] = split_cross_references(section)
+    data["description"], data["cross references"] = split_cross_references(section)
 
-    data['excepts'] = []
-    data['name'], _ = subtract_excepts(data['name'], data['excepts'])
-    data['description'], _ = subtract_excepts(data['description'], data['excepts'])
+    data["excepts"] = []
+    data["name"], _ = subtract_excepts(data["name"], data["excepts"])
+    data["description"], _ = subtract_excepts(data["description"], data["excepts"])
 
     return data
 
 
 def sector_heading(section):
-    return any("the sector as a whole" in line.lower()
-               for line in section)
+    return any("the sector as a whole" in line.lower() for line in section)
 
 
 def extract_naics_data(filepath):
@@ -102,7 +103,7 @@ def extract_naics_data(filepath):
     sections = []
     this_section = []
 
-    for i, line in enumerate(parser.from_file(filepath)['content'].split("\n")):
+    for i, line in enumerate(parser.from_file(filepath)["content"].split("\n")):
         line = clean_line(line)
 
         # Skip initial blank lines
@@ -119,8 +120,9 @@ def extract_naics_data(filepath):
     # Last section not in loop
     sections.append(this_section)
 
-    return [process_section(section) for section in sections
-            if not sector_heading(section)]
+    return [
+        process_section(section) for section in sections if not sector_heading(section)
+    ]
 
 
 def save_naics_data(data):

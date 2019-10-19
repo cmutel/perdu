@@ -7,7 +7,7 @@ REPLACEMENTS = [
     (", at regional storehouse", ""),
     (", at plant", ""),
     (", AP-42", ""),
-    (", m3", "")
+    (", m3", ""),
 ]
 REPLACEMENTS.extend([(", {}".format(x), "") for x in range(1990, 2030)])
 

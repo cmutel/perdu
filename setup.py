@@ -46,6 +46,7 @@ setup(
         ]
     },
     install_requires=[
+        'peewee',
         'appdirs',
         'docopt',
         'whoosh',

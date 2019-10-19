@@ -30,17 +30,15 @@ def create_gs1_search_index(dirpath, data):
     indx = get_index(dirpath)
     writer = indx.writer()
     for record in data:
-        if record['level'] != 'brick':
+        if record["level"] != "brick":
             continue
-        writer.add_document(
-            **{k: v for k, v in record.items() if k in FIELDS}
-        )
+        writer.add_document(**{k: v for k, v in record.items() if k in FIELDS})
     writer.commit()
 
 
 def add_score(obj):
     new = dict(obj.items())
-    new['score'] = obj.score
+    new["score"] = obj.score
     return new
 
 
@@ -48,20 +46,9 @@ def search_gs1(string, dirpath, limit=5):
     indx = get_index(dirpath)
     string = prepare_query(string)
 
-    boosts = {
-        "brick": 5,
-        "klass": 3,
-        "family": 2,
-        "segment": 1,
-        "definition": 2,
-    }
+    boosts = {"brick": 5, "klass": 3, "family": 2, "segment": 1, "definition": 2}
 
-    qp = MultifieldParser(
-        list(boosts),
-        indx.schema,
-        fieldboosts=boosts,
-        group=OrGroup,
-    )
+    qp = MultifieldParser(list(boosts), indx.schema, fieldboosts=boosts, group=OrGroup)
 
     with indx.searcher() as searcher:
         return [add_score(obj) for obj in searcher.search(qp.parse(string))]
@@ -73,8 +60,7 @@ def search_corrector_gs1(string, dirpath, limit=3):
     with indx.searcher() as s:
         corrector = s.corrector("definition")
         possibilities = [
-            corrector.suggest(term, limit=limit)
-            for term in string.split(" ")
+            corrector.suggest(term, limit=limit) for term in string.split(" ")
         ]
 
     return possibilities

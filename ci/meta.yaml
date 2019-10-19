@@ -18,6 +18,7 @@ requirements:
     - python
     - setuptools
   run:
+    - peewee
     - appdirs
     - docopt
     - flask

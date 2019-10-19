@@ -27,17 +27,15 @@ def create_naics_search_index(dirpath, data):
     indx = get_index(dirpath)
     writer = indx.writer()
     for record in data:
-        if len(record['code']) != 6:
+        if len(record["code"]) != 6:
             continue
-        writer.add_document(
-            **{k: v for k, v in record.items() if k in FIELDS}
-        )
+        writer.add_document(**{k: v for k, v in record.items() if k in FIELDS})
     writer.commit()
 
 
 def add_score(obj):
     new = dict(obj.items())
-    new['score'] = obj.score
+    new["score"] = obj.score
     return new
 
 
@@ -45,17 +43,9 @@ def search_naics(string, dirpath, limit=5):
     indx = get_index(dirpath)
     string = prepare_query(string)
 
-    boosts = {
-        "name": 5,
-        "description": 2,
-    }
+    boosts = {"name": 5, "description": 2}
 
-    qp = MultifieldParser(
-        list(boosts),
-        indx.schema,
-        fieldboosts=boosts,
-        group=OrGroup,
-    )
+    qp = MultifieldParser(list(boosts), indx.schema, fieldboosts=boosts, group=OrGroup)
 
     with indx.searcher() as searcher:
         return [add_score(obj) for obj in searcher.search(qp.parse(string))]

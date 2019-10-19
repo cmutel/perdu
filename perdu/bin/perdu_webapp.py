@@ -19,7 +19,7 @@ import os
 
 
 def main():
-    args = docopt(__doc__, version='Perdu webapp 1.0')
+    args = docopt(__doc__, version="Perdu webapp 1.0")
     port = int(args.get("--port", False) or 5000)
     host = "localhost" if args.get("--localhost", False) else "0.0.0.0"
 
