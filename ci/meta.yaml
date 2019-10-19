@@ -1,12 +1,12 @@
 package:
-  name: <your_library_name>-dev
+  name: perdu-dev
   version: {{ environ['VERSION'] }}
 
 source:
   path: ..
 
 build:
-  noarch_python: True
+  noarch: python
   number: 0
   script: python setup.py install --single-version-externally-managed --record record.txt
   script_env:
@@ -18,15 +18,18 @@ requirements:
     - python
     - setuptools
   run:
+    - appdirs
+    - docopt
+    - flask
     - python
-    - <other conda dependencies>
+    - whoosh
 
 test:
   imports:
-    - {{ name }}
+    - perdu
 
 about:
-  home: <Github repo URL>
+  home: "https://github.com/cmutel/perdu"
   license: BSD License
-  summary: '<One line description>'
+  summary: "Python library and webapp for searching standard industry and product classifiers"
 license_family: BSD

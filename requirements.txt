@@ -1,2 +1,4 @@
 appdirs
 docopt
+flask
+whoosh

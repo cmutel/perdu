@@ -1,6 +1,6 @@
 # Only need to change these two variables
-PKG_NAME=<your_library_name>-dev
-USER=<your conda username>
+PKG_NAME=perdu-dev
+USER=cmutel
 
 mkdir ~/conda-bld
 conda config --set anaconda_upload no

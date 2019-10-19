@@ -22,17 +22,16 @@ before_install:
       export PATH="$HOME/miniconda/bin:$PATH";
       hash -r;
       conda config --set always_yes yes --set changeps1 no;
+      conda update -n base -c defaults conda;
       conda config --append channels conda-forge;
-      conda update conda;
       conda info -a;
       echo $(python --version);
     fi
 install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-      conda create -n test-environment python=$TRAVIS_PYTHON_VERSION <add your conda dependencies here> pytest pytest-cov coveralls;
+      conda create -n test-environment python=$TRAVIS_PYTHON_VERSION appdirs docopt whoosh flask pytest pytest-cov coveralls;
       source activate test-environment;
-      pip install <add any other dependencies not available in conda here>;
-      pip3 install -e .;
+      pip install -e .;
     else
       pip3 install -r ci/macos-travis.txt;
       pip3 install -e .;
@@ -41,7 +40,7 @@ script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
       pwd;
       ls;
-      pytest --cov=<your_library_name>;
+      pytest --cov=perdu;
       coveralls;
       if [ "$TRAVIS_BRANCH" = "master" -a "$TRAVIS_PULL_REQUEST" = "false" ]; then
         conda install conda-build anaconda-client conda-verify;
