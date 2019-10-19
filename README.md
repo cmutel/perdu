@@ -10,6 +10,14 @@ While in development, install using conda:
 
     conda -c conda-forge -c cmutel/label/nightly perdu-dev
 
+Depends on:
+
+* peewee
+* appdirs
+* docopt
+* flask
+* whoosh
+
 ## Usage
 
 As a webapp:

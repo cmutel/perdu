@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 db_filepath = base_dir / "perdu-uploads.db"
-database = SqliteDatabase(db_filepath)
+database = SqliteDatabase(str(db_filepath))
 
 abspath = lambda x: str(x.absolute()) if isinstance(x, Path) else x
 
