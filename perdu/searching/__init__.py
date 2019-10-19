@@ -34,4 +34,3 @@ search_gs1 = partial(_search_gs1, dirpath=gs1_index_dir)
 search_corrector_gs1 = partial(_search_corrector_gs1, dirpath=gs1_index_dir)
 search_naics = partial(_search_naics, dirpath=naics_index_dir)
 search_corrector_naics = partial(_search_corrector_naics, dirpath=naics_index_dir)
-
