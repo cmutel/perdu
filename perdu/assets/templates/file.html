@@ -4,11 +4,13 @@
 
   <p><a href="{{ url_for('index') }}">Home</a></p>
 
-  <table class="u-full-width">
+  <table class="u-full-width" id="search_results_table">
     <thead>
       <tr>
         <th>Name</th>
         <th>Description</th>
+        <th>Match</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody>
@@ -16,9 +18,67 @@
       <tr>
         <td>{{ row[0] }}</td>
         <td>{{ row[1] }}</td>
+        <td></td>
+        <td></td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+
+<!-- The Modal -->
+<div id="modal_match" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+
+
+    <div class="container" style="margin-left:5%;margin-right:5%;max-width:none;">
+      <div class="row"  style="width:100%">
+      <div class="one-half column">
+         <p>Finding a match for: </p><span id="item_to_match"></span>
+      </div>
+      <div class="one-half column">
+         <p>Include the following catalogues: </p>
+        <form>
+          <input type="checkbox" name="gs1" value="gs1" style="float:left;transform: scale(1.5);margin:3px;" checked>
+          <div><h6>GS1</h6></div>
+          <input type="checkbox" name="naics" value="naics" style="float:left;transform: scale(1.5);margin:3px;" checked><div><h6>NAICS</h6></div>
+        </form>
+      </div>
+    </div>
+
+      <div class="row" style="width:100%">
+        <div class="one-half column">
+          <h3>Suggested entries</h3>
+          <table id="response_table">
+            <thead>
+            </thead>
+            <tbody>
+              <tr>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="one-half column">
+          <h3>Not what you are looking for?</h3>
+          <form class="form-inline" style="margin: 0 auto;">
+              <input  type="search"
+                     placeholder="Search for products"
+                     aria-label="Search"
+                     id="search_input"
+                     style="width:400px;">
+            </form>
+        </div>
+      </div>
+  </div>
+  </div>
+
+
+
+</div>
+
+<!-- Import JS script -->
+<script src="{{ url_for('static', filename='js/matching.js') }}"></script>
 {% include 'footer.html' %}

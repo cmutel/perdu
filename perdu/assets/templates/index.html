@@ -3,15 +3,15 @@
   <div class="row" style="margin-top: 20%">
     <div>
       <h4>Perdu webapp</h4>
-      <p><a href="https://github.com/cmutel/perdu">Perdu</a> is a python library and webapp for searching standard industry and product classifiers.</p>
+      <p><a href="https://github.com/cmutel/perdu" target="_blank">Perdu</a> is a python library and webapp for searching standard industry and product classifiers.</p>
     </div>
   </div>
   <dir class="row">
     <div class="one-half column">
       <h5>Search nomenclature catalogues:</h5>
       <ul>
-        <li><a href="{{ url_for('search', catalogue='naics') }}">NAICS</a> (<a href="https://www.census.gov/eos/www/naics/">what is this?</a>)</li>
-        <li><a href="{{ url_for('search', catalogue='gs1') }}">GS1 GPC</a> (<a href="https://www.gs1.org/standards/gpc">what is this?</a>)</li>
+        <li><a href="{{ url_for('search', catalogue='naics') }}">NAICS</a> (<a href="https://www.census.gov/eos/www/naics/" target="_blank">what is this?</a>)</li>
+        <li><a href="{{ url_for('search', catalogue='gs1') }}">GS1 GPC</a> (<a href="https://www.gs1.org/standards/gpc" target="_blank">what is this?</a>)</li>
       </ul>
     </div>
     <div class="one-half column">
@@ -19,6 +19,15 @@
       <form method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
         <input type="file" name="file_upload">
         <button class="button" type="submit">Upload</button>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
       </form>
     </div>
   </div>
