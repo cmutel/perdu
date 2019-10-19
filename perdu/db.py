@@ -36,6 +36,10 @@ class File(Model):
         self.sha256 = sha256(self.filepath)
         super().save(*args, **kwargs)
 
+    def get_sha(self):
+        self.sha256 = sha256(self.filepath)
+
+
     class Meta:
         database = database
 
