@@ -12,3 +12,9 @@ def get_gs1_data():
 
 def get_naics_data():
     return json.loads((bz2.BZ2File(data_dir / "naics.json.bz2").read()).decode("utf-8"))
+
+
+def get_useeio_data():
+    return json.loads(
+        (bz2.BZ2File(data_dir / "useeio.json.bz2").read()).decode("utf-8")
+    )

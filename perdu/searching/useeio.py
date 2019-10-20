@@ -5,7 +5,7 @@ from whoosh.qparser import MultifieldParser, OrGroup, DisMaxParser
 import os
 
 
-naics_schema = Schema(
+useeio_schema = Schema(
     description=TEXT(stored=True),
     code=ID(stored=True),
     name=TEXT(stored=True, sortable=True),
@@ -18,22 +18,18 @@ def get_index(dirpath):
     except index.EmptyIndexError:
         if not os.path.exists(dirpath):
             os.mkdir(dirpath)
-        return index.create_in(dirpath, naics_schema)
+        return index.create_in(dirpath, useeio_schema)
 
 
-def create_naics_search_index(dirpath, data):
-    FIELDS = ("description", "code", "name")
-
+def create_useeio_search_index(dirpath, data):
     indx = get_index(dirpath)
     writer = indx.writer()
     for record in data:
-        if len(record["code"]) != 6:
-            continue
-        writer.add_document(**{k: v for k, v in record.items() if k in FIELDS})
+        writer.add_document(**record)
     writer.commit()
 
 
-def search_naics(string, dirpath, limit=5):
+def search_useeio(string, dirpath, limit=5):
     indx = get_index(dirpath)
     string = prepare_query(string)
 
@@ -45,7 +41,7 @@ def search_naics(string, dirpath, limit=5):
         return [add_score(obj) for obj in searcher.search(qp.parse(string))]
 
 
-def search_naics_disjoint(string, dirpath, limit=5):
+def search_useeio_disjoint(string, dirpath, limit=5):
     indx = get_index(dirpath)
     string = prepare_query(string)
 
@@ -57,7 +53,7 @@ def search_naics_disjoint(string, dirpath, limit=5):
         return [add_score(obj) for obj in searcher.search(qp.parse(string))]
 
 
-def search_corrector_naics(string, dirpath, limit=3):
+def search_corrector_useeio(string, dirpath, limit=3):
     indx = get_index(dirpath)
 
     with indx.searcher() as s:

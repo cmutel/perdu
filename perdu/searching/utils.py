@@ -1,6 +1,5 @@
 import unicodedata
 
-
 REPLACEMENTS = [
     ("market for ", ""),
     ("Market for ", ""),
