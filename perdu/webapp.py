@@ -1,8 +1,13 @@
 from . import (
+    search_gs1_disjoint,
     search_gs1,
     search_corrector_gs1,
+    search_naics_disjoint,
     search_naics,
     search_corrector_naics,
+    search_useeio_disjoint,
+    search_useeio,
+    search_corrector_useeio,
     base_dir,
     File,
 )
@@ -45,8 +50,9 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-search_mapping = {"naics": search_naics, "gs1": search_gs1}
-corrector_mapping = {"naics": search_corrector_naics, "gs1": search_corrector_gs1}
+# search_mapping = {"naics": search_naics_disjoint, "gs1": search_gs1_disjoint, 'useeio': search_useeio_disjoint}
+search_mapping = {"naics": search_naics, "gs1": search_gs1, 'useeio': search_useeio}
+corrector_mapping = {"naics": search_corrector_naics, "gs1": search_corrector_gs1, 'useeio': search_corrector_useeio}
 
 
 @perdu_app.route("/", methods=["GET", "POST"])
@@ -109,7 +115,8 @@ def uploaded_file(hash):
         raise (404)
     data = mapping[file.kind](file.filepath)
     return render_template(
-        "file.html", title="File: {}".format(file.name), filename=file.name, data=data
+        "file.html", title="File: {}".format(file.name), filename=file.name, data=data,
+        catalogues=list(search_mapping)
     )
 
 
@@ -146,30 +153,12 @@ def upload():
         return redirect(url_for("index"))
 
 
-@perdu_app.route("/get_search_results/<catalogue>/<item_to_search_for>")
-def get_search_results(catalogue, item_to_search_for):
+@perdu_app.route("/get_search_results/<catalog>/<query>")
+def get_search_results(catalog, query):
+    search_function = search_mapping[catalog]
+    results = search_function(query)
+    if catalog == "gs1":
+        for elem in results:
+            elem['name'] = elem.pop("brick")
 
-    if catalogue == "gs1":
-        data = [
-            [results[d] for d in results if d in ("brick", "definition", "family")]
-            for results in search_gs1(item_to_search_for)
-        ]
-    elif catalogue == "naics":
-        data = [
-            [results[d] for d in results if d in ("brick", "definition", "family")]
-            for results in search_naics(item_to_search_for)
-        ]
-    else:
-        data = [
-            [results[d] for d in results if d in ("brick", "definition", "family")]
-            for results in search_gs1(item_to_search_for)
-        ]
-
-        data.extend(
-            [
-                [results[d] for d in results if d in ("brick", "definition", "family")]
-                for results in search_naics(item_to_search_for)
-            ]
-        )
-
-    return jsonify(data)
+    return jsonify(results)

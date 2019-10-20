@@ -1,6 +1,6 @@
 {% include 'header.html' %}
 <div class="container">
-  <h4>Search results: (<a href="{{ url_for('search') }}">new search</a>)</h4>
+  <h4>Search results: (<a href="{{ url_for('search') }}">new search</a>) | <a href="{{ url_for('index') }}">Home</a></h4>
   <p>Search term: {{ search_term }} ({{ catalogue }})</p>
   {% if corrections %}
   <p>Alternate search suggestions:

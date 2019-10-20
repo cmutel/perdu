@@ -51,7 +51,7 @@
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 200px;
+  width: 500px;
   background-color: black;
   color: #fff;
   text-align: center;
@@ -66,4 +66,9 @@
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
+}
+
+.checkbox-grid li {
+  display: block;
+  float: left;
 }
