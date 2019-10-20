@@ -18,7 +18,7 @@ from flask import (
     send_file,
     url_for,
     jsonify,
-    json
+    json,
 )
 from peewee import DoesNotExist, IntegrityError
 from werkzeug.utils import secure_filename
@@ -95,9 +95,9 @@ def search():
 
 @perdu_app.route("/file/<hash>/selection", methods=["POST"])
 def selection_made(hash):
-    d = json.loads(request.form['json'])
-    item_to_match = d['item to match']
-    selection = d['match']
+    d = json.loads(request.form["json"])
+    item_to_match = d["item to match"]
+    selection = d["match"]
     return ""
 
 
@@ -145,24 +145,31 @@ def upload():
         flash("The extension of the file provided may be wrong")
         return redirect(url_for("index"))
 
+
 @perdu_app.route("/get_search_results/<catalogue>/<item_to_search_for>")
 def get_search_results(catalogue, item_to_search_for):
 
     if catalogue == "gs1":
-        data = [[results[d] for d in results
-                 if d in ('brick', 'definition', 'family')]
-                for results in search_gs1(item_to_search_for)]
+        data = [
+            [results[d] for d in results if d in ("brick", "definition", "family")]
+            for results in search_gs1(item_to_search_for)
+        ]
     elif catalogue == "naics":
-        data = [[results[d] for d in results
-                 if d in ('brick', 'definition', 'family')]
-                for results in search_naics(item_to_search_for)]
+        data = [
+            [results[d] for d in results if d in ("brick", "definition", "family")]
+            for results in search_naics(item_to_search_for)
+        ]
     else:
-        data = [[results[d] for d in results
-         if d in ('brick', 'definition', 'family')]
-        for results in search_gs1(item_to_search_for)]
+        data = [
+            [results[d] for d in results if d in ("brick", "definition", "family")]
+            for results in search_gs1(item_to_search_for)
+        ]
 
-        data.extend([[results[d] for d in results
-                 if d in ('brick', 'definition', 'family')]
-                for results in search_naics(item_to_search_for)])
+        data.extend(
+            [
+                [results[d] for d in results if d in ("brick", "definition", "family")]
+                for results in search_naics(item_to_search_for)
+            ]
+        )
 
     return jsonify(data)
