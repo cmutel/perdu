@@ -1,6 +1,6 @@
-from .utils import prepare_query
+from .utils import prepare_query, add_score
 from whoosh.fields import TEXT, ID, Schema
-from whoosh import index, query
+from whoosh import index
 from whoosh.qparser import MultifieldParser, OrGroup
 import os
 
@@ -33,12 +33,6 @@ def create_naics_search_index(dirpath, data):
     writer.commit()
 
 
-def add_score(obj):
-    new = dict(obj.items())
-    new["score"] = obj.score
-    return new
-
-
 def search_naics(string, dirpath, limit=5):
     indx = get_index(dirpath)
     string = prepare_query(string)
@@ -46,6 +40,18 @@ def search_naics(string, dirpath, limit=5):
     boosts = {"name": 5, "description": 2}
 
     qp = MultifieldParser(list(boosts), indx.schema, fieldboosts=boosts, group=OrGroup)
+
+    with indx.searcher() as searcher:
+        return [add_score(obj) for obj in searcher.search(qp.parse(string))]
+
+
+def search_naics_disjoint(string, dirpath, limit=5):
+    indx = get_index(dirpath)
+    string = prepare_query(string)
+
+    boosts = {"name": 5, "description": 2}
+
+    qp = DisMaxParser(boosts, indx.schema)
 
     with indx.searcher() as searcher:
         return [add_score(obj) for obj in searcher.search(qp.parse(string))]

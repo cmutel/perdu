@@ -17,3 +17,9 @@ def prepare_query(string):
     for x, y in REPLACEMENTS:
         string = string.replace(x, y)
     return string
+
+
+def add_score(obj):
+    new = dict(obj.items())
+    new["score"] = obj.score
+    return new

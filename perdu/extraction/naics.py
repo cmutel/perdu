@@ -6,7 +6,7 @@ import os
 import re
 
 
-header = re.compile("^\s*(?P<code>\d{3,6})\s+\w+")
+header = re.compile(r"^\s*(?P<code>\d{3,6})\s+\w+")
 excepts = re.compile(r" \([Ee]xcept([^(]|\(.?\))*\)")
 
 
