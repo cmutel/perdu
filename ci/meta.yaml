@@ -24,6 +24,8 @@ requirements:
     - flask
     - python
     - whoosh
+    - rdflib
+    - rdflib-jsonld
 
 test:
   imports:

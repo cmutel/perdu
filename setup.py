@@ -46,11 +46,13 @@ setup(
         ]
     },
     install_requires=[
-        'peewee',
         'appdirs',
         'docopt',
-        'whoosh',
         'flask',
+        'peewee',
+        'rdflib',
+        'rdflib-jsonld',
+        'whoosh',
     ],
     url="https://github.com/cmutel/perdu",
     long_description_content_type='text/markdown',

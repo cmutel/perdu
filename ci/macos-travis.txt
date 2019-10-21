@@ -1,6 +1,8 @@
-peewee
 appdirs
 docopt
 flask
+peewee
 pytest
+rdflib
+rdflib-jsonld
 whoosh

@@ -279,37 +279,14 @@ document.getElementById("export-ttl").onclick = function (event) {
   xhr.send(data);
 }
 
-
-// function exit_modal(btn){
-//     var match = btn.getAttribute("data");
-//     var item_to_search_for = btn.getAttribute("data-origin");
-//     var table = document.getElementById("search_results_table");
-
-//     // Iterate through rows
-//     for (var i = 0, row; row = table.rows[i]; i++) {
-//         if (row.cells[0].innerHTML == item_to_search_for){
-//             row.cells[2].innerHTML = match;
-//             // Hide modal
-//             // Send selection to web app
-//             var payload = {
-//                 'item to match': item_to_search_for,
-//                 'match': match
-//             };
-
-//             var data = new FormData();
-//             data.append( "json", JSON.stringify(payload) );
-
-//             fetch("/file/<hash>/selection",
-//             {
-//                 method: "POST",
-//                 body: data
-//             });
-
-
-//             return;
-//         };
-//     };
-// };
+document.getElementById("export-jsonld").onclick = function (event) {
+  var xhr = new XMLHttpRequest();
+  var url = "/export/jsonld";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  var data = JSON.stringify(match_data);
+  xhr.send(data);
+}
 
 // Populate table with search results as the search field is updated.
 var table = document.getElementById('refine-search-field');

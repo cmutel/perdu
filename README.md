@@ -12,10 +12,12 @@ While in development, install using conda:
 
 Depends on:
 
-* peewee
 * appdirs
 * docopt
 * flask
+* peewee
+* rdflib
+* rdflib-jsonld
 * whoosh
 
 ## Usage
