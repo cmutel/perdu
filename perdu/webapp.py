@@ -99,11 +99,11 @@ def search():
         )
 
 
-@perdu_app.route("/file/<hash>/selection", methods=["POST"])
-def selection_made(hash):
-    d = json.loads(request.form["json"])
-    item_to_match = d["item to match"]
-    selection = d["match"]
+@perdu_app.route("/export/<method>", methods=["POST"])
+def export_linked_data(method):
+    content = request.get_json()
+    import pprint
+    pprint.pprint(content)
     return ""
 
 
@@ -153,12 +153,19 @@ def upload():
         return redirect(url_for("index"))
 
 
+def normalize_search_results(result):
+    if 'brick' in result:
+        return {
+            'description': result.pop("definition"),
+            'name': result.pop('brick'),
+            'class': result.pop("klass"),
+        }
+    else:
+        return result
+
+
 @perdu_app.route("/get_search_results/<catalog>/<query>")
 def get_search_results(catalog, query):
     search_function = search_mapping[catalog]
-    results = search_function(query)
-    if catalog == "gs1":
-        for elem in results:
-            elem['name'] = elem.pop("brick")
-
+    results = [normalize_search_results(o) for o in search_function(query)]
     return jsonify(results)
