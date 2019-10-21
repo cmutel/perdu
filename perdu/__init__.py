@@ -1,6 +1,6 @@
 __version__ = (0, 1)
 
-from .filesystem import base_dir
+from .filesystem import base_dir, export_dir
 from .searching import (
     search_gs1,
     search_gs1_disjoint,
