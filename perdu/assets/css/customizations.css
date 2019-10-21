@@ -72,3 +72,23 @@
   display: block;
   float: left;
 }
+
+.narrower {
+  color: #592A71;
+}
+
+.broader {
+  color: #AA3C39;
+}
+
+.exact {
+  color: #2D8632;
+}
+
+.approximate {
+  color: #A8AA39;
+}
+
+.selected-element {
+  box-shadow: 0 0 5px 5px #33C3F0;
+}

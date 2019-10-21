@@ -39,25 +39,28 @@
 
     <div class="container" style="margin-left:5%;margin-right:5%;max-width:none;">
       <div class="row"  style="width:100%">
-      <div class="one-half column" style="overflow:hidden"><span id="item_to_match"></span></div>
+      <div class="one-half column" style="overflow:hidden">
+        <span id="item_to_match"></span>
+        <input type="button" class="button-primary" id="save-match" name="save-match-button" value="Save">
+      </div>
       <div class="one-half column">
         <ul>
           <h4>Match type:</h4>
           <label>
-            <input type="radio" name="match_type" value="exact" checked>
-            <span class="label-body">Exact match</span>
+            <input type="radio" name="match_type" value="exact" class="match-type" checked>
+            <span class="label-body exact">Exact match</span>
           </label>
           <label>
-            <input type="radio" name="match_type" value="approximate">
-            <span class="label-body">Approximate match</span>
+            <input type="radio" name="match_type" value="approximate" class="match-type">
+            <span class="label-body approximate">Approximate match</span>
           </label>
           <label>
-            <input type="radio" name="match_type" value="broader">
-            <span class="label-body">Match is broader than query</span>
+            <input type="radio" name="match_type" value="broader" class="match-type">
+            <span class="label-body broader">Match is broader than query</span>
           </label>
           <label>
-            <input type="radio" name="match_type" value="narrower">
-            <span class="label-body">Match is narrower than query</span>
+            <input type="radio" name="match_type" value="narrower" class="match-type">
+            <span class="label-body narrower">Match is narrower than query</span>
           </label>
         </ul>
       </div>
@@ -68,7 +71,6 @@
           <h4>Suggested entries</h4>
           <table id="response_table">
             <tbody>
-              <th>Name</th><th>Action</th>
             </tbody>
           </table>
         </div>
@@ -93,20 +95,38 @@
 <!-- Import JS script -->
 <script type="text/javascript">
 var catalog = null;
+var match_data = new Map();
+var match_type = "exact";
+var match_row = null;
 
 (function set_initial_catalog() {
   catalog = "{{ catalogues[0] }}";
 })();
 
+// Handle match type selection
+var match_type_buttons = document.querySelectorAll(".match-type");
+for (i = 0; i < match_type_buttons.length; i++) {
+  match_type_buttons[i].addEventListener('click', toggle_match_type);
+}
+
+function toggle_match_type(button) {
+    match_type = button.target.value;
+    if (match_row !== null) {
+      match_row.classList.remove("exact", "approximate", "broader", "narrower");
+      match_row.classList.add(match_type);
+    }
+}
+
+// Bring up matching modal window
+var row_buttons = document.querySelectorAll(".row-matching");
+for (i = 0; i < row_buttons.length; i++) {
+  row_buttons[i].addEventListener('click', show_modal);
+}
+
 // Catalog selection
 var catalog_buttons = document.querySelectorAll(".catalog-selection");
 for (i = 0; i < catalog_buttons.length; i++) {
   catalog_buttons[i].addEventListener('click', toggle_catalog_selection);
-}
-
-var row_buttons = document.querySelectorAll(".row-matching");
-for (i = 0; i < row_buttons.length; i++) {
-  row_buttons[i].addEventListener('click', show_modal);
 }
 
 function toggle_catalog_selection(button) {
@@ -122,7 +142,7 @@ function toggle_catalog_selection(button) {
 }
 
 function check_exit(row) {
-  console.log(row);
+  return;
 }
 
 function query(query_string){
@@ -141,27 +161,29 @@ function query(query_string){
         var tableRows = table.getElementsByTagName('tr');
         var rowCount = tableRows.length;
 
-        if (rowCount > 0) {
-          for (var x=rowCount-1; x>0; x--) {
-             table.removeChild(tableRows[x]);
-          }
+        for (var x=rowCount-1; x>0; x--) {
+           table.removeChild(tableRows[x]);
         }
 
         // row is integer index starting from 0
         for (var row in data) {
           var tr = document.createElement('tr');
-          var btn = document.createElement('input');
-          btn.className = "button";
-          btn.type = "submit";
-          btn.value = "Select";
-          btn.style = "float:right;margin:5px;";
-          // btn.setAttribute('data', body[row][0].toString().slice(0,40));
-          // btn.setAttribute('data-origin', item_to_match);
-          btn.onclick = check_exit(this);
-
           var div_label = document.createElement('div');
-          div_label.className="tooltip";
+          div_label.className="tooltip possible-match";
           div_label.innerHTML = data[row].name.slice(0,40);
+          div_label.id = "match-row-" + row.toString();
+
+          div_label.onclick = function (row) {
+            match_row = row.target;
+            row.target.classList.remove("exact", "approximate", "broader", "narrower");
+            row.target.classList.add("selected-element", match_type);
+            var all_matches = document.querySelectorAll('.possible-match');
+            Array.prototype.forEach.call(all_matches, function(element, index) {
+              if (row.target.id !== element.id) {
+                element.classList.remove("selected-element");
+              }
+            });
+          }
 
           var tooltip = document.createElement('span')
           tooltip.className = "tooltiptext";
@@ -171,11 +193,7 @@ function query(query_string){
           var td_label = document.createElement('td');
           td_label.append(div_label);
 
-          var td_button = document.createElement('td');
-          td_button.append(btn);
-
           tr.append(td_label);
-          tr.append(td_button);
           table.append(tr);
         };
     });
@@ -210,7 +228,7 @@ function show_modal(button){
     query(row_text);
     // Display modal
     modal.style.display = "block";
-    };
+};
 
 
 function exit_modal(btn){
@@ -248,7 +266,7 @@ function exit_modal(btn){
 };
 
 // Populate table with search results as the search field is updated.
-var table = document.getElementById('search_input');
+var table = document.getElementById('refine-search-field');
 table.addEventListener('input', function (evt) {
     query(this.value);
 });
