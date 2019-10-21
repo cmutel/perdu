@@ -108,6 +108,7 @@ def search():
 @perdu_app.route("/export/<method>", methods=["POST"])
 def export_linked_data(method):
     content = request.get_json()
+
     if method == "ttl":
         fp = write_matching_to_rdf(content)
     elif method == "jsonld":

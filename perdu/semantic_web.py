@@ -39,7 +39,7 @@ def write_matching_to_rdf(data, format="turtle", extension="ttl"):
 
     # Now describe our links
     for key in (key for key in data if key.startswith("row-")):
-        uri = "http://perdu.data/source/{}".format(data["hash"])
+        uri = "http://perdu.data/source/{}/{}".format(data["hash"], key.replace("row-", ""))
         node = URIRef(uri)
         g.add((node, RDF.type, olca.Flow))
         g.add((node, RDFS.label, Literal(data[key]["source"])))
