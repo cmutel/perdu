@@ -1,17 +1,19 @@
 from . import (
-    search_gs1_disjoint,
-    search_gs1,
-    search_corrector_gs1,
-    search_naics_disjoint,
-    search_naics,
-    search_corrector_naics,
-    search_useeio_disjoint,
-    search_useeio,
-    search_corrector_useeio,
     base_dir,
+    export_dir,
     File,
+    search_corrector_gs1,
+    search_corrector_naics,
+    search_corrector_useeio,
+    search_gs1,
+    search_gs1_disjoint,
+    search_naics,
+    search_naics_disjoint,
+    search_useeio,
+    search_useeio_disjoint,
 )
 from .ingestion import mapping
+from .semantic_web import write_matching_to_rdf
 from flask import (
     abort,
     flash,
@@ -51,8 +53,12 @@ def allowed_file(filename):
 
 
 # search_mapping = {"naics": search_naics_disjoint, "gs1": search_gs1_disjoint, 'useeio': search_useeio_disjoint}
-search_mapping = {"naics": search_naics, "gs1": search_gs1, 'useeio': search_useeio}
-corrector_mapping = {"naics": search_corrector_naics, "gs1": search_corrector_gs1, 'useeio': search_corrector_useeio}
+search_mapping = {"naics": search_naics, "gs1": search_gs1, "useeio": search_useeio}
+corrector_mapping = {
+    "naics": search_corrector_naics,
+    "gs1": search_corrector_gs1,
+    "useeio": search_corrector_useeio,
+}
 
 
 @perdu_app.route("/", methods=["GET", "POST"])
@@ -99,12 +105,21 @@ def search():
         )
 
 
-@perdu_app.route("/file/<hash>/selection", methods=["POST"])
-def selection_made(hash):
-    d = json.loads(request.form["json"])
-    item_to_match = d["item to match"]
-    selection = d["match"]
-    return ""
+@perdu_app.route("/export/<method>", methods=["POST"])
+def export_linked_data(method):
+    content = request.get_json()
+
+    if method == "ttl":
+        fp = write_matching_to_rdf(content)
+    elif method == "jsonld":
+        fp = write_matching_to_rdf(content, "json-ld", "json")
+    return jsonify({"fp": fp.name})
+
+
+@perdu_app.route("/download/<path>", methods=["GET"])
+def download_export(path):
+    fp = export_dir / path
+    return send_file(fp, as_attachment=True)
 
 
 @perdu_app.route("/file/<hash>", methods=["GET"])
@@ -115,8 +130,12 @@ def uploaded_file(hash):
         raise (404)
     data = mapping[file.kind](file.filepath)
     return render_template(
-        "file.html", title="File: {}".format(file.name), filename=file.name, data=data,
-        catalogues=list(search_mapping)
+        "file.html",
+        title="File: {}".format(file.name),
+        filename=file.name,
+        data=data,
+        catalogues=list(search_mapping),
+        hash=hash,
     )
 
 
@@ -153,12 +172,19 @@ def upload():
         return redirect(url_for("index"))
 
 
+def normalize_search_results(result):
+    if "brick" in result:
+        return {
+            "description": result.pop("definition"),
+            "name": result.pop("brick"),
+            "class": result.pop("klass"),
+        }
+    else:
+        return result
+
+
 @perdu_app.route("/get_search_results/<catalog>/<query>")
 def get_search_results(catalog, query):
     search_function = search_mapping[catalog]
-    results = search_function(query)
-    if catalog == "gs1":
-        for elem in results:
-            elem['name'] = elem.pop("brick")
-
+    results = [normalize_search_results(o) for o in search_function(query)]
     return jsonify(results)

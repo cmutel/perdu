@@ -2,12 +2,16 @@
 <div class="container">
   <h4>File {{ filename }}:</h4>
 
-  <p><a href="{{ url_for('index') }}">Home</a> | Search catalogues: </p>
-  <div class="one column"></div>
-  <div class="eleven columns">
+  <div class="six columns">
+    <p><a href="{{ url_for('index') }}">Home</a> | Search catalogues:</p>
     {% for catalog in catalogues %}
-    <input class="{% if loop.first %}button-primary{% else %}button{% endif %} catalog-selection" type="button" value="{{ catalog }}">
+      <input class="{% if loop.first %}button-primary{% else %}button{% endif %} catalog-selection" type="button" value="{{ catalog }}">
     {% endfor %}
+  </div>
+  <div class="five columns" id="export-section" style="display: none">
+    <p> Export current matches:</p>
+    <input type="button" id="export-ttl" class="button"  value="Export as TTL" />
+    <input type="button" id="export-jsonld" class="button"  value="Export as JSON-LD" />
   </div>
 
   <table class="u-full-width" id="search_results_table">
@@ -96,11 +100,15 @@
 <script type="text/javascript">
 var catalog = null;
 var match_data = new Map();
+match_data['hash'] = "{{ hash }}";
 var match_type = "exact";
+var source_row = null;
 var match_row = null;
+
 
 (function set_initial_catalog() {
   catalog = "{{ catalogues[0] }}";
+  match_data['catalog'] = "{{ catalogues[0] }}";
 })();
 
 // Handle match type selection
@@ -130,6 +138,7 @@ for (i = 0; i < catalog_buttons.length; i++) {
 }
 
 function toggle_catalog_selection(button) {
+    match_data['catalog'] = button.target.value;
     var all_buttons = document.querySelectorAll('.catalog-selection');
     Array.prototype.forEach.call(all_buttons, function(elements, index) {
         if (button.target.value === elements.value) {
@@ -141,10 +150,7 @@ function toggle_catalog_selection(button) {
     });
 }
 
-function check_exit(row) {
-  return;
-}
-
+// Query catalog and reset result table
 function query(query_string){
     var opts = {
       method: 'GET',
@@ -200,8 +206,41 @@ function query(query_string){
     });
 };
 
+// Update result table and save model data
+document.getElementById("save-match").onclick = function (event) {
+  var row = source_row.children[0];
+  var matched_string = '';
+  // reset our saved results
+  match_data[row.id] = {
+    "source": row.textContent,
+    "matches": new Array()
+  };
+
+  var labels = ["exact", "approximate", "narrower", "broader"];
+  var matches_array = match_data[row.id]["matches"];
+
+  // Add data from each row
+  var table = document.getElementById("response_table");
+  for (var i = 0, tr; tr = table.rows[i]; i++) {
+    var div = tr.children[0].children[0];
+    for (label of labels) {
+      if (div.classList.contains(label)) {
+        matches_array.push({"method": label, "data": div.data});
+        matched_string += "<span class=\"" + label + "\">" + div.data.name.slice(0,40) + "</span> "
+      };
+    };
+    source_row.children[1].innerHTML = matched_string;
+  };
+
+  document.getElementById('export-section').style.display = 'inline';
+  var modal = document.getElementById('modal_match')
+  modal.style.display = "none";
+};
+
 
 function show_modal(button){
+    source_row = button.target.parentElement.parentElement;
+
     var span = document.getElementsByClassName("close")[0];
     // When the user clicks on <span> (x), close the modal
     span.onclick = function() {
@@ -231,40 +270,60 @@ function show_modal(button){
     modal.style.display = "block";
 };
 
+// Export as TTL
+document.getElementById("export-ttl").onclick = function (event) {
+  var xhr = new XMLHttpRequest();
+  var url = "/export/ttl";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
 
-function exit_modal(btn){
-    var match = btn.getAttribute("data");
-    var item_to_search_for = btn.getAttribute("data-origin");
-    var table = document.getElementById("search_results_table");
+  xhr.onreadystatechange=function() {
+    if (xhr.readyState==4 && xhr.status==200){
+      var fp = JSON.parse(xhr.responseText).fp;
+      var button = document.getElementById("export-ttl");
+      var new_form = document.createElement('form');
+      new_form.style = "margin: 0; padding: 0; display:inline";
+      new_form.innerHTML = '<input display="inline" type="submit" class="button-primary" value="Download TTL" />';
+      new_form.action = "/download/" + fp;
+      button.replaceWith(new_form);
+    }
+  }
 
-    // Iterate through rows
-    for (var i = 0, row; row = table.rows[i]; i++) {
-        if (row.cells[0].innerHTML == item_to_search_for){
-            row.cells[2].innerHTML = match;
-            // Hide modal
-            var modal = document.getElementById('modal_match')
-            modal.style.display = "none";
-            // Send selection to web app
-            var payload = {
-                'item to match': item_to_search_for,
-                'match': match
-            };
+  var data = JSON.stringify(match_data);
+  xhr.send(data);
+}
 
-            var data = new FormData();
-            data.append( "json", JSON.stringify(payload) );
+// Export as JSON-LD
+document.getElementById("export-jsonld").onclick = function (event) {
+  var xhr = new XMLHttpRequest();
+  var url = "/export/jsonld";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+  var data = JSON.stringify(match_data);
+  xhr.send(data);
+}
 
-            fetch("/file/<hash>/selection",
-            {
-                method: "POST",
-                body: data
-            });
+document.getElementById("export-jsonld").onclick = function (event) {
+  var xhr = new XMLHttpRequest();
+  var url = "/export/jsonld";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
 
+  xhr.onreadystatechange=function() {
+    if (xhr.readyState==4 && xhr.status==200){
+      var fp = JSON.parse(xhr.responseText).fp;
+      var button = document.getElementById("export-jsonld");
+      var new_form = document.createElement('form');
+      new_form.style = "margin: 0; padding: 0; display:inline";
+      new_form.innerHTML = '<input display="inline" type="submit" class="button-primary" value="Download JSON-LD" />';
+      new_form.action = "/download/" + fp;
+      button.replaceWith(new_form);
+    }
+  }
 
-            return;
-        };
-    };
-
-};
+  var data = JSON.stringify(match_data);
+  xhr.send(data);
+}
 
 // Populate table with search results as the search field is updated.
 var table = document.getElementById('refine-search-field');

@@ -27,7 +27,7 @@ def package_files(directory):
 
 setup(
     name='perdu',
-    version="0.1",
+    version="0.1.1",
     packages=packages,
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
@@ -46,11 +46,13 @@ setup(
         ]
     },
     install_requires=[
-        'peewee',
         'appdirs',
         'docopt',
-        'whoosh',
         'flask',
+        'peewee',
+        'rdflib',
+        'rdflib-jsonld',
+        'whoosh',
     ],
     url="https://github.com/cmutel/perdu",
     long_description_content_type='text/markdown',
