@@ -172,6 +172,7 @@ function query(query_string){
           div_label.className="tooltip possible-match";
           div_label.innerHTML = data[row].name.slice(0,40);
           div_label.id = "match-row-" + row.toString();
+          div_label.data = data[row];
 
           div_label.onclick = function (row) {
             match_row = row.target;
