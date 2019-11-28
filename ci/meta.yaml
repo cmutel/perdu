@@ -22,10 +22,12 @@ requirements:
     - appdirs
     - docopt
     - flask
+    - pandas
     - python
     - whoosh
     - rdflib
     - rdflib-jsonld
+    - xlrd
 
 test:
   imports:

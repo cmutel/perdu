@@ -16,7 +16,7 @@ install:
   - call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
   - python --version
   - conda config --set always_yes yes
-  - conda install -y -c conda-forge rdflib-jsonld peewee appdirs docopt whoosh flask pytest pytest-cov
+  - conda install -y -c conda-forge rdflib-jsonld pandas xlrd peewee appdirs docopt whoosh flask pytest pytest-cov
   - pip install -e .
 
 test_script:

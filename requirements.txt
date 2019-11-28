@@ -1,7 +1,9 @@
 appdirs
 docopt
 flask
+pandas
 peewee
 rdflib
 rdflib-jsonld
 whoosh
+xlrd
