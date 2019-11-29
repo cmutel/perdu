@@ -14,6 +14,7 @@ from . import (
 )
 from .ingestion import mapping
 from .semantic_web import write_matching_to_rdf
+from .export_generic import write_matching_to_csv_dataframe
 from flask import (
     abort,
     flash,
@@ -27,18 +28,28 @@ from flask import (
     jsonify,
     json,
 )
-from peewee import DoesNotExist, IntegrityError
+import hashlib
+from pathlib import Path
+from peewee import DoesNotExist
 from werkzeug.utils import secure_filename
+import os
+
 
 perdu_app = Flask(
     "perdu_app", static_folder="perdu/assets/", template_folder="perdu/assets/templates"
 )
 
-import os
 
 UPLOAD_FOLDER = base_dir / "uploads"
 UPLOAD_FOLDER.mkdir(exist_ok=True)
-ALLOWED_EXTENSIONS = {"xml", "spold", "csv"}
+ALLOWED_EXTENSIONS = {
+    # "xml",
+    # "spold",
+    "csv",
+    "xlsx",
+    "xls",
+    "zip",
+}
 
 # Default limit for file uploads is 5 MB
 perdu_app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
@@ -59,6 +70,7 @@ corrector_mapping = {
     "gs1": search_corrector_gs1,
     "useeio": search_corrector_useeio,
 }
+file_kind_mapping = {"csv": "csv", "xlsx": "bom", "xls": "bom", "zip": "jsonld"}
 
 
 @perdu_app.route("/", methods=["GET", "POST"])
@@ -113,6 +125,8 @@ def export_linked_data(method):
         fp = write_matching_to_rdf(content)
     elif method == "jsonld":
         fp = write_matching_to_rdf(content, "json-ld", "json")
+    elif method == "csv":
+        fp = write_matching_to_csv_dataframe(content)
     return jsonify({"fp": fp.name})
 
 
@@ -153,20 +167,27 @@ def upload():
         flash("No selected file")
         return redirect(url_for("index"))
     if file and allowed_file(file.filename):
+        filehash = hashlib.sha256(file.read()).hexdigest()
 
-        filename = secure_filename(file.filename)
-        # If the file has already been uploaded once, peewee will throw an IntegrityError exception because the
-        # entry is already in the DB
         try:
+            file_obj = File.get(sha256=filehash)
+            return redirect(url_for("uploaded_file", hash=file_obj.sha256))
+        except DoesNotExist:
+            file.seek(0)
+            filename = secure_filename(file.filename)
+            fn_path = Path(filename)
+            stem, suffix = fn_path.stem, fn_path.suffix
+            shorthash = filehash[:12]
+            filename = f"{stem}.{shorthash}{suffix}"
             file.save(str(UPLOAD_FOLDER / filename))
-            file_row = File.create(
-                name=filename, filepath=UPLOAD_FOLDER / filename, kind="csv"
-            )
-        except IntegrityError:
-            file_row = File.get(name=filename)
-            return redirect(url_for("uploaded_file", hash=file_row.sha256))
 
-        return redirect(url_for("uploaded_file", hash=file_row.sha256))
+            file_obj = File.create(
+                name=filename,
+                filepath=UPLOAD_FOLDER / filename,
+                kind=file_kind_mapping[suffix[1:]],
+                sha256=filehash,
+            )
+            return redirect(url_for("uploaded_file", hash=file_obj.sha256))
     else:
         flash("The extension of the file provided may be wrong")
         return redirect(url_for("index"))

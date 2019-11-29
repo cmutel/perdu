@@ -32,13 +32,6 @@ class File(Model):
     sha256 = TextField(unique=True)
     kind = TextField()
 
-    def save(self, *args, **kwargs):
-        self.sha256 = sha256(self.filepath)
-        super().save(*args, **kwargs)
-
-    def get_sha(self):
-        self.sha256 = sha256(self.filepath)
-
     class Meta:
         database = database
 

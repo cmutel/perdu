@@ -2,16 +2,17 @@
 <div class="container">
   <h4>File {{ filename }}:</h4>
 
-  <div class="six columns">
+  <div class="five columns">
     <p><a href="{{ url_for('index') }}">Home</a> | Search catalogues:</p>
     {% for catalog in catalogues %}
       <input class="{% if loop.first %}button-primary{% else %}button{% endif %} catalog-selection" type="button" value="{{ catalog }}">
     {% endfor %}
   </div>
-  <div class="five columns" id="export-section" style="display: none">
+  <div class="six columns" id="export-section" style="display: none">
     <p> Export current matches:</p>
-    <input type="button" id="export-ttl" class="button"  value="Export as TTL" />
-    <input type="button" id="export-jsonld" class="button"  value="Export as JSON-LD" />
+    <input type="button" id="export-ttl" class="button"  value="As TTL" />
+    <input type="button" id="export-jsonld" class="button"  value="As JSON-LD" />
+    <input type="button" id="export-csv" class="button"  value="As Pandas CSV" />
   </div>
 
   <table class="u-full-width" id="search_results_table">
@@ -299,15 +300,6 @@ document.getElementById("export-jsonld").onclick = function (event) {
   var url = "/export/jsonld";
   xhr.open("POST", url, true);
   xhr.setRequestHeader("Content-Type", "application/json");
-  var data = JSON.stringify(match_data);
-  xhr.send(data);
-}
-
-document.getElementById("export-jsonld").onclick = function (event) {
-  var xhr = new XMLHttpRequest();
-  var url = "/export/jsonld";
-  xhr.open("POST", url, true);
-  xhr.setRequestHeader("Content-Type", "application/json");
 
   xhr.onreadystatechange=function() {
     if (xhr.readyState==4 && xhr.status==200){
@@ -316,6 +308,29 @@ document.getElementById("export-jsonld").onclick = function (event) {
       var new_form = document.createElement('form');
       new_form.style = "margin: 0; padding: 0; display:inline";
       new_form.innerHTML = '<input display="inline" type="submit" class="button-primary" value="Download JSON-LD" />';
+      new_form.action = "/download/" + fp;
+      button.replaceWith(new_form);
+    }
+  }
+
+  var data = JSON.stringify(match_data);
+  xhr.send(data);
+}
+
+// Export as Pandas Dataframe CSV
+document.getElementById("export-csv").onclick = function (event) {
+  var xhr = new XMLHttpRequest();
+  var url = "/export/csv";
+  xhr.open("POST", url, true);
+  xhr.setRequestHeader("Content-Type", "application/json");
+
+  xhr.onreadystatechange=function() {
+    if (xhr.readyState==4 && xhr.status==200){
+      var fp = JSON.parse(xhr.responseText).fp;
+      var button = document.getElementById("export-csv");
+      var new_form = document.createElement('form');
+      new_form.style = "margin: 0; padding: 0; display:inline";
+      new_form.innerHTML = '<input display="inline" type="submit" class="button-primary" value="Download Pandas CSV" />';
       new_form.action = "/download/" + fp;
       button.replaceWith(new_form);
     }
