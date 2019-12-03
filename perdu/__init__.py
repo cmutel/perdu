@@ -1,4 +1,4 @@
-__version__ = (0, 2)
+__version__ = (0, 2, 1)
 
 from .filesystem import base_dir, export_dir
 from .searching import (

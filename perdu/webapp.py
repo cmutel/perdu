@@ -35,8 +35,12 @@ from werkzeug.utils import secure_filename
 import os
 
 
+BASE_DIR = Path(__file__).resolve().parent
+
 perdu_app = Flask(
-    "perdu_app", static_folder="perdu/assets/", template_folder="perdu/assets/templates"
+    "perdu_app",
+    static_folder=BASE_DIR / "assets",
+    template_folder=BASE_DIR / "assets" / "templates"
 )
 
 

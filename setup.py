@@ -27,7 +27,7 @@ def package_files(directory):
 
 setup(
     name='perdu',
-    version="0.2",
+    version="0.2.1",
     packages=packages,
     author="Chris Mutel",
     author_email="cmutel@gmail.com",
